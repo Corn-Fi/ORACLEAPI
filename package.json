@@ -9,6 +9,7 @@
   "license": "MIT",
   "dependencies": {
     "babel-cli": "^6.26.0",
+    "dotenv": "^10.0.0",
     "ethers": "^5.5.2",
     "express": "^4.17.1",
     "mongoose": "^6.0.14"
