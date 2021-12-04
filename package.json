@@ -1,7 +1,7 @@
 {
-  "name": "src",
+  "name": "ORACLEAPI",
   "scripts": {
-    "build": "babel src -d lib",
+    "build": "babel . -d lib",
     "start": "yarn node index"
   },
   "version": "1.0.0",
