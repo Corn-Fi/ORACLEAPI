@@ -1,8 +1,8 @@
 {
   "name": "ORACLEAPI",
   "scripts": {
-    "test": "echo \"no test specced\" && exit 1",
-    "start": "node index.js"
+    "build": "babel . -d lib",
+    "start": "yarn node index"
   },
   "version": "1.0.0",
   "main": "index.js",
@@ -14,6 +14,6 @@
     "mongoose": "^6.0.14"
   },
   "engines": {
-    "node": "16.x"
+    "yarn": "1.x"
   }
 }

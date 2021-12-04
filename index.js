@@ -14,7 +14,9 @@ app.use('/', ethOracleRoute)
 
 
 //run it
-PORT = 8090
+const port = 8090
+
+const PORT = process.env.PORT || 3000
 
 app.listen(
     PORT,
