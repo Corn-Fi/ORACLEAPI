@@ -152,7 +152,12 @@ const getUserNfts = async (userAddress) => {
     return cleaned
 }
 
+//Route
+
 router.get( "/nfts/:address", async (req, res) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  
     const address = req.params.address
     try {
         const nfts = await getUserNfts(address);

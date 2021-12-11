@@ -1,6 +1,7 @@
 const {aggregatorV3InterfaceABI} = require("../utils/abi.js")
 const {addresses} = require("../utils/addresses.js")
 const {ethers} = require("ethers")
+const axios = require("axios")
 require('dotenv').config()
 
 
@@ -45,10 +46,15 @@ const mapPriceData = async (priceData) => {
   
 }
 
+const getNFTs = async () => {
+    const data = await axios.get("https://cornoracleapi.herokuapp.com/stoploss/nfts/0x395977E98105A96328357f847Edc75333015b8f4")
+    const darta = data.data
+    return darta
+}
+
 const main = async () => {
-    const price = await getPrice()
-    const data = await mapPriceData(price)
-    console.log(data)
+    const nfts = await getNFTs()
+    console.log(nfts)
 }
 
 main()
