@@ -165,6 +165,31 @@ router.get( "/nfts/:address", async (req, res) => {
     }
 })
 
+const cleanArray = (stringArray) => {
+    const removefirst = stringArray.slice(1,-1)
+    
+    return removefirst
+}
+
+router.get( "/userTrades/:vaultId&:tokenIds", async (req, res) => {
+
+    const vaultId = req.params.vaultId
+    const cleanedTokenIds = cleanArray(req.params.tokenIds)
+    const tokenIds = Array.from(cleanedTokenIds)
+    const tokenIdNums = tokenIds.map( (id) => {
+        const numId = parseInt(id)
+        return numId
+    })
+    console.log(vaultId)
+    console.log(tokenIdNums)
+    try {
+        const trades = await viewTrades(vaultId, tokenIdNums);
+        res.json(trades)
+    } catch (err) {
+        res.status(500).json({ message: `${err}`})
+    }
+})
+
 module.exports = [
     router
 ]
