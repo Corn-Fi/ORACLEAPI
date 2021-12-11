@@ -1,11 +1,13 @@
 const express = require("express");
 const app = express()
-
+const cors = require("cors")
 const ethers = require("ethers");
 
-
+//cors
+app.use(cors())
 
 //use JSON
+
 app.use(express.json())
 
 //route

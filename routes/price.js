@@ -51,9 +51,7 @@ const mapPriceData = async (priceData) => {
 //actual route/api endpoint
 
 router.get("/:id", async (req, res) => {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  
+
     let symbol = req.params.id
     symbol = symbol.toUpperCase()
     try {
