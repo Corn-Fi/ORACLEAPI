@@ -9,3 +9,7 @@ GET http://localhost:8090/stoploss/nfts/0x395977E98105A96328357f847Edc75333015b8
 ###
 
 GET http://localhost:8090/stoploss/userTrades/1&[0]
+
+###
+
+GET http://localhost:8090/stoploss/openOrders

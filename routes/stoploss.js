@@ -1,6 +1,6 @@
 const express = require("express")
 const router = express.Router()
-const {stopLossVaultABI} = require("../utils/abi")
+const {stopLossVaultABI, mockERC20Abi} = require("../utils/abi")
 const {addresses} = require("../utils/addresses")
 const {ethers} = require("ethers")
 require('dotenv').config()
@@ -18,7 +18,7 @@ const NAME = "STOP_LOSS_v0.1"
 const fetchContract = async (address, abi) => {
     const contract = new ethers.Contract(address, abi, PROVIDER);
     return contract;
-};//works
+}
 
 const bigNumberToString = async (bignum, dec) => {
     const cleaned = ethers.utils.formatUnits(bignum, dec)
@@ -58,6 +58,38 @@ const ownerOfNft = async (tokenId) => {
     return owner
 }
 
+const getTokenSymbol = async (tokenAddress) => {
+    try {
+        const ctr = await fetchContract(tokenAddress, mockERC20Abi)
+        const sym = await ctr.symbol()
+        return sym
+    } catch (err) {
+        if (tokenAddress.toLowerCase() == addresses.USDC.toLowerCase())  {
+            let name = "USDC"
+            return name
+        } else if (tokenAddress.toLowerCase() == addresses.USDT.toLowerCase()) {
+            let name = "USDT"
+            return name
+        } else if (tokenAddress.toLowerCase() == addresses.BTC.toLowerCase()) {
+            let name = "BTC"
+            return name
+        } else if (tokenAddress.toLowerCase() == addresses.ETH.toLowerCase()) {
+            let name = "ETH"
+            return name
+        } else if (tokenAddress.toLowerCase() == addresses.MATIC.toLowerCase()) {
+            let name = "MATIC"
+            return name
+        } else if (tokenAddress.toLowerCase() == addresses.DAI.toLowerCase()) {
+            let name = "DAI"
+            return name
+        } else {
+            let msg = "Symbol Not in Whitelist"
+            console.log(err)
+            return msg
+        }
+    }
+}
+
 
 //
 // CORE
@@ -73,7 +105,9 @@ const viewAllOpenOrders = async () => {
         const resp = raw[0]
 
         const token1 = resp.tokens[0]
+        const token1Name = await getTokenSymbol(token1)
         const token2 = resp.tokens[1]
+        const token2Name = await getTokenSymbol(token2)
         const amounts = resp.amounts
         const orderID = parseInt( await bigNumberToString(resp.orderId, 0))
         const tokenId = parseInt( await bigNumberToString(resp.tokenId, 0))
@@ -86,7 +120,10 @@ const viewAllOpenOrders = async () => {
     
         const ret = {
             vaultId: tokenId,
-            tokens: [token1, token2],
+            tokens: {
+                tokenA: {tokenAddress: token1, tokenName: token1Name},
+                tokenB: {tokenAddress: token2, tokenName: token2Name}
+            },
             amounts: cleanedAmounts,
             orderId: orderID
     
@@ -105,7 +142,9 @@ const viewTrades = async (tokenId, tradeIds) => {
         const resp = raw[0][0]
 
         const token1 = resp.tokens[0]
+        const token1Name = await getTokenSymbol(token1)
         const token2 = resp.tokens[1]
+        const token2Name = await getTokenSymbol(token2)
         const amounts = resp.amounts
         const tokenID = parseInt( await bigNumberToString(resp.tokenId, 0))
 
@@ -118,7 +157,10 @@ const viewTrades = async (tokenId, tradeIds) => {
     
         const ret = {
             vaultId: tokenID,
-            tokens: [token1, token2],
+            tokens: {
+                tokenA: {tokenAddress: token1, tokenName: token1Name},
+                tokenB: {tokenAddress: token2, tokenName: token2Name}
+            },
             amounts: cleanedAmounts
     
         }
@@ -190,6 +232,16 @@ router.get( "/userTrades/:vaultId&:tokenIds", async (req, res) => {
     }
 })
 
+router.get("/openOrders", async (req, res) => {
+    try {
+        const allOrders = await viewAllOpenOrders()
+        res.json(allOrders)
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({ message: `${err}`})
+    }
+})
+
 module.exports = [
     router
 ]
@@ -198,12 +250,12 @@ module.exports = [
 
 // const main = async () => {
 
-//     const data = await viewTrades(1, [0])
+//     // const data = await viewTrades(1, [0])
 
 //     const ln = await viewAllOpenOrders()
-//     const nfts = await getUserNfts("0x395977E98105A96328357f847Edc75333015b8f4")
-//     const ownr = await ownerOfNft(1)
-//     console.log(nfts)
+//     // const nfts = await getUserNfts("0x395977E98105A96328357f847Edc75333015b8f4")
+//     // const ownr = await ownerOfNft(1)
+//     console.log(ln)
 //     console.log("*********")
 
 // }

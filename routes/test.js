@@ -1,4 +1,4 @@
-const {aggregatorV3InterfaceABI} = require("../utils/abi.js")
+const {aggregatorV3InterfaceABI, ERC20Abi, mockERC20Abi} = require("../utils/abi.js")
 const {addresses} = require("../utils/addresses.js")
 const {ethers} = require("ethers")
 const axios = require("axios")
@@ -11,8 +11,8 @@ const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL);
 
 
 
-const fetchContract = async (address, abi, _provider) => {
-    const contract = new ethers.Contract(address, abi, _provider);
+const fetchContract = async (address, abi) => {
+    const contract = new ethers.Contract(address, abi, provider);
     console.log(`loaded contract ${contract.address}`);
     return contract;
 };//works
@@ -52,8 +52,40 @@ const getNFTs = async () => {
     return darta
 }
 
+const getTokenSymbol = async (tokenAddress) => {
+    try {
+        const ctr = await fetchContract(tokenAddress, mockERC20Abi)
+        const sym = await ctr.symbol()
+        return sym
+    } catch (err) {
+        if (tokenAddress.toLowerCase() == addresses.USDC.toLowerCase())  {
+            let name = "USDC"
+            return name
+        } else if (tokenAddress.toLowerCase() == addresses.USDT.toLowerCase()) {
+            let name = "USDT"
+            return name
+        } else if (tokenAddress.toLowerCase() == addresses.BTC.toLowerCase()) {
+            let name = "BTC"
+            return name
+        } else if (tokenAddress.toLowerCase() == addresses.ETH.toLowerCase()) {
+            let name = "ETH"
+            return name
+        } else if (tokenAddress.toLowerCase() == addresses.MATIC.toLowerCase()) {
+            let name = "MATIC"
+            return name
+        } else if (tokenAddress.toLowerCase() == addresses.DAI.toLowerCase()) {
+            let name = "DAI"
+            return name
+        } else {
+            let msg = "Symbol Not in Whitelist"
+            console.log(err)
+            return msg
+        }
+    }
+}
+
 const main = async () => {
-    const nfts = await getNFTs()
+    const nfts = await getTokenSymbol("0x4f9Ea20C144981F6bD20F4260920d5692373E4E5")
     console.log(nfts)
 }
 
