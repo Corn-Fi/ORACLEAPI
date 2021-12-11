@@ -9,14 +9,16 @@ const ethers = require("ethers");
 app.use(express.json())
 
 //route
-const ethOracleRoute = require("./routes/eth")
-app.use('/', ethOracleRoute)
+const priceOracleRoute = require("./routes/price.js")
+app.use('/price', priceOracleRoute)
 
+const stopLossRoute = require("./routes/stoploss.js")
+app.use("/stoploss", stopLossRoute)
 
 //run it
-const port = 8090
+const port = 8090 //for local
 
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT || 3000 //for prod
 
 app.listen(
     PORT,
