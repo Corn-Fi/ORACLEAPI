@@ -13,3 +13,7 @@ GET http://localhost:8090/stoploss/userTrades/1&[0]
 ###
 
 GET http://localhost:8090/stoploss/openOrders
+
+###
+
+GET http://localhost:8090/stoploss/settings

@@ -1,6 +1,6 @@
 const express = require("express")
 const router = express.Router()
-const {stopLossVaultABI, mockERC20Abi} = require("../utils/abi")
+const {stopLossVaultABI, mockERC20Abi, settingsABI} = require("../utils/abi")
 const {addresses} = require("../utils/addresses")
 const {ethers} = require("ethers")
 require('dotenv').config()
@@ -94,6 +94,42 @@ const getTokenSymbol = async (tokenAddress) => {
 //
 // CORE
 //
+const viewSettings = async () => {
+    const ctr =  await fetchContract(addresses.SETTINGS, settingsABI)
+    
+    const one =  ctr.lendingPool()
+    const two =  ctr.rewards()
+    const three =  ctr.aaveMarketTokens()
+    const four = ctr.feePoints()
+    const five = ctr.feeBasePoints()
+    const six = ctr.maxFeePercent()
+    const promises =[one, two, three, four, five, six]
+
+    const [
+        lender,
+        rewards,
+        AMTokens,
+        feePoints,
+        basisPoints,
+        maxFeePercent
+    ] = await Promise.all(promises)
+
+    const feeNum = parseFloat(await bigNumberToString(feePoints, 0))
+    const basisPointsNum = parseFloat(await bigNumberToString(basisPoints, 0))
+    const maxFeePercentNum = parseFloat(await bigNumberToString(maxFeePercent, 0))
+    const feeAsPercent = ((feeNum / basisPointsNum) * 100 )
+    const data = {
+        lendingpool: lender,
+        reward: rewards,
+        aavetokens: AMTokens,
+        feepoints: feeNum,
+        basis: basisPointsNum,
+        maxfeepoints: maxFeePercentNum,
+        feepercent: feeAsPercent
+    }
+
+    return data
+}
 
 const viewAllOpenOrders = async () => {
     const start = 0
@@ -194,7 +230,7 @@ const getUserNfts = async (userAddress) => {
     return cleaned
 }
 
-//Route
+//Routes
 
 router.get( "/nfts/:address", async (req, res) => {
 
@@ -239,6 +275,16 @@ router.get("/openOrders", async (req, res) => {
     } catch (err) {
         console.log(err)
         res.status(500).json({ message: `${err}`})
+    }
+})
+
+router.get("/settings", async (req, res) => {
+    try {
+        const settings = await viewSettings()
+        res.json(settings)
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({message: `${err}`})
     }
 })
 

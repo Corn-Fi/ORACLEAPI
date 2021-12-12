@@ -1,4 +1,4 @@
-const {aggregatorV3InterfaceABI, ERC20Abi, mockERC20Abi} = require("../utils/abi.js")
+const {aggregatorV3InterfaceABI, ERC20Abi, mockERC20Abi, stopLossVaultABI, settingsABI} = require("../utils/abi.js")
 const {addresses} = require("../utils/addresses.js")
 const {ethers} = require("ethers")
 const axios = require("axios")
@@ -83,10 +83,51 @@ const getTokenSymbol = async (tokenAddress) => {
         }
     }
 }
+const bigNumberToString = async (bignum, dec) => {
+    const cleaned = ethers.utils.formatUnits(bignum, dec)
+    return cleaned
+}
+
+const viewSettings = async () => {
+    const ctr =  await fetchContract(addresses.SETTINGS, settingsABI)
+    
+    const one =  ctr.lendingPool()
+    const two =  ctr.rewards()
+    const three =  ctr.aaveMarketTokens()
+    const four = ctr.feePoints()
+    const five = ctr.feeBasePoints()
+    const six = ctr.maxFeePercent()
+    const promises =[one, two, three, four, five, six]
+
+    const [
+        lender,
+        rewards,
+        AMTokens,
+        feePoints,
+        basisPoints,
+        maxFeePercent
+    ] = await Promise.all(promises)
+
+    const feeNum = parseFloat(await bigNumberToString(feePoints, 0))
+    const basisPointsNum = parseFloat(await bigNumberToString(basisPoints, 0))
+    const maxFeePercentNum = parseFloat(await bigNumberToString(maxFeePercent, 0))
+    const feeAsPercent = ((feeNum / basisPointsNum) * 100 )
+    const data = {
+        lendingpool: lender,
+        reward: rewards,
+        aavetokens: AMTokens,
+        feepoints: feeNum,
+        basis: basisPointsNum,
+        maxfeepoints: maxFeePercentNum,
+        feepercent: feeAsPercent
+    }
+
+    return data
+}
 
 const main = async () => {
-    const nfts = await getTokenSymbol("0x4f9Ea20C144981F6bD20F4260920d5692373E4E5")
-    console.log(nfts)
+    const settings = await viewSettings()
+    console.log(settings)
 }
 
 main()
