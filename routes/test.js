@@ -365,12 +365,32 @@ const fetchSettings = async () => {
 
     return data
 }
- 
+
+const getUserTrades = async (nftIds, _vaultMode) => {
+    const vaultSwitch = {
+        0: "limit",
+        1: "stop",
+        2: "accumulatordistributor"
+    }
+    const tradePromises = nftIds.map( async (id) => {
+        const resp = await axios.get(`https://cornoracleapi.herokuapp.com/${vaultSwitch[_vaultMode]}/trades/${id}`)
+        const raw = resp.data
+        return raw 
+    })
+
+    const trades = await Promise.all(tradePromises)
+    return trades
+}
+
 
 const main = async () => {
-    const sym = await getTokenSymbol(addresses.tokens.OMEN)
-    const dec = await getTokenDecimals(addresses.tokens.OMEN)
-    console.log(dec)
+    const vaultSwitch = {
+        0: "limit",
+        1: "stop",
+        2: "accumulatordistributor"
+    }
+    const trades = await getUserTrades([1, 2], 0)
+    console.log(trades)
     // const signer = await fetchSigner()
     // const cobctr = await fetchContract(addresses.tokens.COB, ERC20Abi)
     // const usdcctr = await fetchContract(addresses.tokens.USDC, ERC20Abi)

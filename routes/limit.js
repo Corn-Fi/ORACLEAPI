@@ -60,7 +60,7 @@ const fetchVaultTokensByOwner = async (address) => {
         if (trade.vault == addresses.vaults.limitVault) {
             _vault = "Limit"
             return {
-                id: ethers.utils.formatUnits(trade.tokenId, 0),
+                id: parseInt(ethers.utils.formatUnits(trade.tokenId, 0)),
                 vault: _vault,
                 vaultAddress: trade.vault
             }
