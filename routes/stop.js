@@ -61,7 +61,7 @@ const fetchVaultTokensByOwner = async (address) => {
         } else if (trade.vault == addresses.vaults.stopVault) {
             _vault = "Stop"
             return {
-                id: ethers.utils.formatUnits(trade.tokenId, 0),
+                id: parseInt(ethers.utils.formatUnits(trade.tokenId, 0)),
                 vault: _vault,
                 vaultAddress: trade.vault
             }
@@ -117,8 +117,8 @@ const fetchTrades = async (vaultId, tokenId) => {
 
 
         return {
-            tokenId: ethers.utils.formatUnits(trade.tokenId, 0),
-            tradeId: ethers.utils.formatUnits(trade.tradeId, 0),
+            tokenId: parseInt(ethers.utils.formatUnits(trade.tokenId, 0)),
+            tradeId: parseInt(ethers.utils.formatUnits(trade.tradeId, 0)),
             timestamp: ethers.utils.formatUnits(trade.timestamp, 0),
             tokens: trade.tokens,
             tokens: {

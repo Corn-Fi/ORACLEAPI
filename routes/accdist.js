@@ -65,7 +65,7 @@ const fetchVaultTokensByOwner = async (address) => {
         } else if (trade.vault == addresses.vaults.accDistVault) {
             _vault = "Accumulator Distributor"
             return {
-                id: ethers.utils.formatUnits(trade.tokenId, 0),
+                id: parseInt(ethers.utils.formatUnits(trade.tokenId, 0)),
                 vault: _vault,
                 vaultAddress: trade.vault
             }
@@ -86,6 +86,14 @@ const fetchTrades = async (vaultId, tokenId) => {
     const rawTrades = await ctr.viewTrades(vaultId, tokenId, [0])
     const trades = rawTrades[0]
     const mappedData = trades.map( (trade) => {
+        
+        const tokenActr =  await fetchContract(trade.tokens[0], ERC20Abi)
+        const tokenBctr = await fetchContract(trade.tokens[1], ERC20Abi)
+        const tokenADecimals = await tokenActr.decimals()
+        const tokenBDecimals = await tokenBctr.decimals()
+        const tokenASymbol = await tokenActr.symbol()
+        const tokenBSymbol = await tokenBctr.symbol()
+
         const _amounts = []
         const mappedAmounts = trade.amounts.map( (amount) => {
             
@@ -104,11 +112,22 @@ const fetchTrades = async (vaultId, tokenId) => {
 
 
         return {
-            tokenId: ethers.utils.formatUnits(trade.tokenId, 0),
-            tradeId: ethers.utils.formatUnits(trade.tradeId, 0),
+            tokenId: parseInt(ethers.utils.formatUnits(trade.tokenId, 0)),
+            tradeId: parseInt(ethers.utils.formatUnits(trade.tradeId, 0)),
             timestamp: ethers.utils.formatUnits(trade.timestamp, 0),
-            orderId: ethers.utils.formatUnits(trade.orderId, 0),
             tokens: trade.tokens,
+            tokens: {
+                tokenA: {
+                    address: trade.tokens[0],
+                    decimals: tokenADecimals,
+                    symbol: tokenASymbol
+                },
+                tokenB: {
+                    address: trade.tokens[1],
+                    decimals: tokenBDecimals,
+                    symbol: tokenBSymbol
+                }
+            },
             rates: {
                 amountA: _amountA,
                 amountB: _amountB,

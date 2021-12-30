@@ -112,8 +112,8 @@ const fetchTrades = async (vaultId, tokenId) => {
 
 
         return {
-            tokenId: ethers.utils.formatUnits(trade.tokenId, 0),
-            tradeId: ethers.utils.formatUnits(trade.tradeId, 0),
+            tokenId: parseInt(ethers.utils.formatUnits(trade.tokenId, 0)),
+            tradeId: parseInt(ethers.utils.formatUnits(trade.tradeId, 0)),
             timestamp: ethers.utils.formatUnits(trade.timestamp, 0),
             tokens: trade.tokens,
             tokens: {
