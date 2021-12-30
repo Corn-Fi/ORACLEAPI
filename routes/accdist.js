@@ -85,7 +85,7 @@ const fetchTrades = async (vaultId, tokenId) => {
 
     const rawTrades = await ctr.viewTrades(vaultId, tokenId, [0])
     const trades = rawTrades[0]
-    const mappedData = trades.map( (trade) => {
+    const mappedData = trades.map( async (trade) => {
         
         const tokenActr =  await fetchContract(trade.tokens[0], ERC20Abi)
         const tokenBctr = await fetchContract(trade.tokens[1], ERC20Abi)
