@@ -1,0 +1,22 @@
+{
+  "137": {
+    "AAVEStrategy": [
+      "0xe92364f6F04416bdfbD7cdEd4a2F78e1bbF1b3C8"
+    ],
+    "AccumulatorDistributorVault": [
+      "0xba1E89fdAB23f1097566f69F986dC0BFC49BF6CE"
+    ],
+    "Controller": [
+      "0xfeD1424aF43D162B421EabB162d8678c46bD3E03"
+    ],
+    "LimitOrderVault": [
+      "0xC6b218f51dEC3ce84c961782246d0789327933A3"
+    ],
+    "SimpleStrategy": [
+      "0xA541AC8CC374781f9D29b6E1d5a5F9C9b8256d9F"
+    ],
+    "StopLossVault": [
+      "0xA28566E92E524Acf840B71dDC15Ee8877896947d"
+    ]
+  }
+}

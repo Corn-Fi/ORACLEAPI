@@ -17,3 +17,31 @@ GET http://localhost:8090/stoploss/openOrders
 ###
 
 GET http://localhost:8090/stoploss/settings
+
+###
+
+GET http://localhost:8090/limit/openOrders
+
+###
+
+GET http://localhost:8090/limit/vaults/0x395977E98105A96328357f847Edc75333015b8f4
+
+###
+
+GET http://localhost:8090/limit/trades/1
+###
+
+GET http://localhost:8090/stop/openOrders
+
+###
+GET http://localhost:8090/stop/vaults/0x395977E98105A96328357f847Edc75333015b8f4
+
+###
+
+GET http://localhost:8090/stop/trades/17
+
+###
+GET http://localhost:8090/accumulatordistributor/vaults/0x395977E98105A96328357f847Edc75333015b8f4
+###
+
+GET http://localhost:8090/accumulatordistributor/openOrders

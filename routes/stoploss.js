@@ -138,33 +138,36 @@ const viewAllOpenOrders = async () => {
     const raw = await ctr.viewOpenOrdersInRange(start, end)
 
     try {
-        const resp = raw[0]
-
-        const token1 = resp.tokens[0]
-        const token1Name = await getTokenSymbol(token1)
-        const token2 = resp.tokens[1]
-        const token2Name = await getTokenSymbol(token2)
-        const amounts = resp.amounts
-        const orderID = parseInt( await bigNumberToString(resp.orderId, 0))
-        const tokenId = parseInt( await bigNumberToString(resp.tokenId, 0))
-        const amountsPromises = amounts.map( async (amount) => {
-            const cleaned = await bigNumberToString(amount)
-            return cleaned
+        const trades = raw
+        const mapResp = trades.map( async (trade) => {
+            const token1 = trade.tokens[0]
+            const token1Name = await getTokenSymbol(token1)
+            const token2 = trade.tokens[1]
+            const token2Name = await getTokenSymbol(token2)
+            const amounts = trade.amounts
+            const orderID = parseInt( await bigNumberToString(trade.orderId, 0))
+            const tokenId = parseInt( await bigNumberToString(trade.tokenId, 0))
+            const amountsPromises = amounts.map( async (amount) => {
+                const cleaned = await bigNumberToString(amount)
+                return cleaned
+            })
+        
+            const cleanedAmounts = await Promise.all(amountsPromises)
+            const ret = {
+                vaultId: tokenId,
+                tokens: {
+                    tokenA: {tokenAddress: token1, tokenName: token1Name},
+                    tokenB: {tokenAddress: token2, tokenName: token2Name}
+                },
+                amounts: cleanedAmounts,
+                orderId: orderID
+        
+            }
+            return ret
         })
-    
-        const cleanedAmounts = await Promise.all(amountsPromises)
-    
-        const ret = {
-            vaultId: tokenId,
-            tokens: {
-                tokenA: {tokenAddress: token1, tokenName: token1Name},
-                tokenB: {tokenAddress: token2, tokenName: token2Name}
-            },
-            amounts: cleanedAmounts,
-            orderId: orderID
-    
-        }
-        return ret
+ 
+        const cleanedResp = await Promise.all(mapResp)
+        return cleanedResp
     } catch (err) {console.log(err)}
 
 
