@@ -45,3 +45,11 @@ GET http://localhost:8090/accumulatordistributor/vaults/0x395977E98105A96328357f
 ###
 
 GET http://localhost:8090/accumulatordistributor/openOrders
+
+###
+
+GET http://localhost:8090/chef/poolData
+
+###
+
+GET http://localhost:8090/chef/userPoolData/0x395977E98105A96328357f847Edc75333015b8f4

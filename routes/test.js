@@ -384,11 +384,7 @@ const getUserTrades = async (nftIds, _vaultMode) => {
 
 
 const main = async () => {
-    const vaultSwitch = {
-        0: "limit",
-        1: "stop",
-        2: "accumulatordistributor"
-    }
+    
     const trades = await getUserTrades([1, 2], 0)
     console.log(trades)
     // const signer = await fetchSigner()

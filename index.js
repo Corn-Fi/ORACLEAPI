@@ -26,6 +26,9 @@ app.use("/stop", stopRoute)
 const accDistRoute = require("./routes/accdist.js")
 app.use("/accumulatordistributor", accDistRoute)
 
+const chef = require("./routes/chef.js")
+app.use("/chef", chef)
+
 //run it
 const port = 8090 //for local
 
