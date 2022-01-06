@@ -395,6 +395,20 @@ const fetchRankedLiquidity = async (_token) => {
     return rankedTokenLiquidity
 }
 
+const getAPY = async (_poolTVL, _tokenPerBlock) => {
+
+    const reward = await fetchBestLP(addresses.tokens.COB) 
+    const rwrd = reward.DerivedMaticPrice
+    const TVL = new BigNumber(_poolTVL)
+    const rewardPrice = new BigNumber(rwrd)
+    const tokenPB = new BigNumber(_tokenPerBlock)
+    const BPY = new BigNumber(15768000) //2s avg
+
+    const rewardPerYear = rewardPrice.multipliedBy(tokenPB).multipliedBy(BPY)
+    const APY = rewardPerYear.dividedBy(TVL).multipliedBy(100)
+    return APY.toPrecision()
+}
+
 
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 // $$$$$$$$$ CORE    $$$$$$$$$$$$$$$$$$
@@ -447,6 +461,7 @@ const fetchUserLPData = async (_token, _userAddress) => {
     }) //imported from ../utils/pools
 
     const _poolId = POOL[0].pid
+    const _rewardTokenPerBlock = POOL[0].cobPerBlock
     const chefctr = await fetchContract(addresses.CHEF.masterChef, MasterchefAbi)
     const pairctr = await fetchContract(_token, UniPairAbi)
 
@@ -525,6 +540,8 @@ const fetchUserLPData = async (_token, _userAddress) => {
         const p = new BigNumber(poolValue1)
         const poolTVL = o.plus(p).toPrecision()
 
+        const APY = await getAPY(poolTVL, _rewardTokenPerBlock)
+
 
         const data = {
             USER: {
@@ -533,6 +550,7 @@ const fetchUserLPData = async (_token, _userAddress) => {
                 userLPRatio: userLPRatio,
                 userStakedValue: userStakedValue,
                 poolTVL: poolTVL,
+                APY: APY
             },
 
             LP: {
@@ -563,10 +581,13 @@ const fetchUserTokenData = async (_token, _userAddress) => {
         return pool.tokenStakeAddress.toLowerCase() == _token.toLowerCase()
     }) //imported from ../utils/pools
     let _poolId;
+    let _rewardTokenPerBlock;
     if (POOL[0] !== undefined) {
         _poolId = POOL[0].pid
+        _rewardTokenPerBlock = POOL[0].cobPerBlock
     } else {
         _poolId = 1 //just return a ppol for calcs sake
+        _rewardTokenPerBlock = 0
     }
     
     // Act I the token
@@ -634,13 +655,15 @@ const fetchUserTokenData = async (_token, _userAddress) => {
     const g = f.multipliedBy(d)
     const _poolTVL = g.toPrecision()
 
+    const APY = await getAPY(_poolTVL, _rewardTokenPerBlock)
 
     const data = {
         USER: {
           stakedAmount: stakedAmount,
           userTokenRatio: _userTokenRatio,
           userMaticValue: _userMaticValue,
-          poolTVL: _poolTVL
+          poolTVL: _poolTVL,
+          APY: APY
         },
         Token: {
           ...singleToken
@@ -679,6 +702,8 @@ router.get('/userPoolData/:userAddress', async (req, res) => {
 module.exports = [
     router
 ]
+
+
 
 
 

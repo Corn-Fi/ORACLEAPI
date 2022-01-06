@@ -9,6 +9,7 @@ const pools = [
         tokenEarnAddress: "0x793AcF39c3d605d3aD042Ae01fd290a6fE489164",
         tokenEarnName: "COB",
         tokenEarnLogoName: "cornlogo",
+        cobPerBlock: 0.5,
         multiplier: "2x",
         depositFee: "10%"
 
@@ -23,6 +24,7 @@ const pools = [
         tokenEarnAddress: "0x793AcF39c3d605d3aD042Ae01fd290a6fE489164",
         tokenEarnName: "COB",
         tokenEarnLogoName: "cornlogo",
+        cobPerBlock: 0.5,
         multiplier: "2x",
         depositFee: "10%"
 
@@ -36,6 +38,7 @@ const pools = [
         tokenEarnAddress: "0x793AcF39c3d605d3aD042Ae01fd290a6fE489164",
         tokenEarnName: "COB",
         tokenEarnLogoName: "cornlogo",
+        cobPerBlock: 0.5,
         multiplier: "2x",
         depositFee: "10%"
 
@@ -50,6 +53,7 @@ const pools = [
         tokenEarnAddress: "0x793AcF39c3d605d3aD042Ae01fd290a6fE489164",
         tokenEarnName: "COB",
         tokenEarnLogoName: "cornlogo",
+        cobPerBlock: 0.5,
         multiplier: "2x",
         depositFee: "10%"
 
