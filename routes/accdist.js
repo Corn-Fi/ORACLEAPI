@@ -188,6 +188,8 @@ router.get( "/vaults/:address", async (req, res) => {
     try {
         const nfts = await fetchVaultTokensByOwner(address);
         res.json(nfts)
+        res.header("Access-Control-Allow-Origin", "*");
+        res.header("Access-Control-Allow-Headers", "X-Requested-With");
     } catch (err) {
         res.status(500).json({ message: `${err}`})
     }
@@ -197,6 +199,8 @@ router.get("/openOrders", async (req, res) => {
     try {
         const allOrders = await fetchOpenOrders(2)
         res.json(allOrders)
+        res.header("Access-Control-Allow-Origin", "*");
+        res.header("Access-Control-Allow-Headers", "X-Requested-With");
     } catch (err) {
         console.log(err)
         res.status(500).json({ message: `${err}`})
@@ -211,6 +215,8 @@ router.get( "/trades/:tokenId", async (req, res) => {
 
     try {
         const trades = await fetchTrades(2, tokenId);
+        res.header("Access-Control-Allow-Origin", "*");
+        res.header("Access-Control-Allow-Headers", "X-Requested-With");
         res.json(trades)
     } catch (err) {
         res.status(500).json({ message: `${err}`})

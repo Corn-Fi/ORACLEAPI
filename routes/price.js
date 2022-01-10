@@ -55,9 +55,11 @@ router.get("/:id", async (req, res) => {
     let symbol = req.params.id
     symbol = symbol.toUpperCase()
     try {
+        
         const price = await getPrice(symbol)
         const data = await mapPriceData(price)
-   
+        res.header("Access-Control-Allow-Origin", "*");
+        res.header("Access-Control-Allow-Headers", "X-Requested-With");
         res.json(data)
     } catch (err) {
         res.status(500).json({ message: `${err}` })

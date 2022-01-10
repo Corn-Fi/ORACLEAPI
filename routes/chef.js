@@ -676,10 +676,14 @@ const fetchUserTokenData = async (_token, _userAddress) => {
 // $$$$$$$$$ ENDPOINTS    $$$$$$$$$$$$$
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
+
 router.get('/poolData', async (req, res) => {
     try {
         const data = await fetchAllPoolData()
+        res.header("Access-Control-Allow-Origin", "*");
+        res.header("Access-Control-Allow-Headers", "X-Requested-With");
         res.json(data)
+        
     } catch (err) {
         res.json(err)
         res.status(500)
@@ -687,6 +691,8 @@ router.get('/poolData', async (req, res) => {
 })
 
 router.get('/userPoolData/:userAddress', async (req, res) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "X-Requested-With");
     const userAddress = req.params.userAddress
     try {
         const data = await fetchAllUserPoolData(userAddress)
