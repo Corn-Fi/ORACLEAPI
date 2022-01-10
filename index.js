@@ -4,7 +4,10 @@ const cors = require("cors")
 const ethers = require("ethers");
 
 //cors
-app.use(cors())
+app.use(cors({
+    origin: process.env.ORIGIN,
+    credentials: true,
+  }))
 
 //use JSON
 
