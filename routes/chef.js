@@ -498,7 +498,7 @@ const fetchUserLPData = async (_token, _userAddress) => {
     const _rewardTokenPerBlock = POOL[0].cobPerBlock
     const chefctr = await fetchContract(addresses.CHEF.masterChef, MasterchefAbi)
     const pairctr = await fetchContract(_token, UniPairAbi)
-    const allowances = await fetchAllowances("0xAEFac7De344509cc05fB806898E18C8B8bD0024c")
+    const allowances = await fetchAllowances(_userAddress)
 
     const allowance = allowances[_poolId]
 
@@ -673,7 +673,7 @@ const fetchUserTokenData = async (_token, _userAddress) => {
 
     const userInfo = await chefctr.userInfo(_poolId, _userAddress)
     const stakedAmount = ethers.utils.formatUnits(userInfo.amount, decimals)
-    const allowances = await fetchAllowances("0xAEFac7De344509cc05fB806898E18C8B8bD0024c")
+    const allowances = await fetchAllowances(_userAddress)
 
     const allowance = allowances[_poolId]
 
