@@ -395,6 +395,40 @@ const fetchRankedLiquidity = async (_token) => {
     return rankedTokenLiquidity
 }
 
+const fetchAllowances = async (_user) => {
+
+    
+
+    const tokens = pools.map( pool => { 
+        return {
+            address: pool.tokenStakeAddress,
+            decimals: pool.decimals
+        } 
+    })
+
+    const allowancePromises = tokens.map( async (token) => {
+        const ctr = await fetchContract(token.address, ERC20Abi)
+        const ttl =  ctr.allowance(_user, addresses.CHEF.masterChef)
+        return ttl
+    })
+
+    const results = await Promise.all(allowancePromises)
+
+    const allowances = results.map( (result) => {
+        const data = ethers.utils.formatUnits(result, 0)
+        if (data == "0") {
+            return false
+        }
+        else {
+            return true
+        }
+        
+    })
+
+    return allowances
+
+}
+
 const getAPY = async (_poolTVL, _tokenPerBlock) => {
 
     const reward = await fetchBestLP(addresses.tokens.COB) 
@@ -464,6 +498,9 @@ const fetchUserLPData = async (_token, _userAddress) => {
     const _rewardTokenPerBlock = POOL[0].cobPerBlock
     const chefctr = await fetchContract(addresses.CHEF.masterChef, MasterchefAbi)
     const pairctr = await fetchContract(_token, UniPairAbi)
+    const allowances = await fetchAllowances("0xAEFac7De344509cc05fB806898E18C8B8bD0024c")
+
+    const allowance = allowances[_poolId]
 
     if (_userAddress.toLowerCase() !== addresses.CHEF.masterChef.toLowerCase()) {
         const userInfo = await chefctr.userInfo(_poolId, _userAddress)
@@ -547,6 +584,7 @@ const fetchUserLPData = async (_token, _userAddress) => {
             USER: {
                 poolStakedAmount: poolTotalStaked,
                 userStakedAmount: stakedAmount,
+                allowance: allowance,
                 userLPRatio: userLPRatio,
                 userStakedValue: userStakedValue,
                 poolTVL: poolTVL,
@@ -635,6 +673,10 @@ const fetchUserTokenData = async (_token, _userAddress) => {
 
     const userInfo = await chefctr.userInfo(_poolId, _userAddress)
     const stakedAmount = ethers.utils.formatUnits(userInfo.amount, decimals)
+    const allowances = await fetchAllowances("0xAEFac7De344509cc05fB806898E18C8B8bD0024c")
+
+    const allowance = allowances[_poolId]
+
 
     //incoming Math lolz
     BigNumber.config({ EXPONENTIAL_AT: 10 })
@@ -657,9 +699,12 @@ const fetchUserTokenData = async (_token, _userAddress) => {
 
     const APY = await getAPY(_poolTVL, _rewardTokenPerBlock)
 
+    
+
     const data = {
         USER: {
           stakedAmount: stakedAmount,
+          allowance: allowance,
           userTokenRatio: _userTokenRatio,
           userMaticValue: _userMaticValue,
           poolTVL: _poolTVL,
@@ -702,6 +747,7 @@ router.get('/userPoolData/:userAddress', async (req, res) => {
         res.json(err)
     }
 })
+
 
 
 
