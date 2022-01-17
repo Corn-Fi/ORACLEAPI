@@ -10,20 +10,19 @@ const BigNumber = require("bignumber.js");
 const { ERC20Abi } = require("../utils/abi.js")
 
 
-const provider = new ethers.providers.JsonRpcProvider("https://rpc-mainnet.maticvigil.com/v1/4b331c188697971af1cd6f05bb7065bc358b7e89");
+require('dotenv').config()
 
+const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL);
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 // $$$$$$$$$ HELPERS $$$$$$$$$$$$$$$$$$
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
 const fetchSigner = async () => {
-    const provider = new ethers.providers.JsonRpcProvider("https://rpc-mainnet.maticvigil.com/v1/4b331c188697971af1cd6f05bb7065bc358b7e89");
-    const wsProvider = new ethers.providers.WebSocketProvider("wss://rpc-mainnet.maticvigil.com/ws/v1/4b331c188697971af1cd6f05bb7065bc358b7e89");
+    const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL);
     
     const wallet = new ethers.Wallet(process.env.PRIVATE_KEY);
     
     const signer = wallet.connect(provider);
-    const wsSigner = wallet.connect(provider);
     console.log(`connected to ${signer.address}`);
     
     return signer;

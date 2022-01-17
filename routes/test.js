@@ -1,29 +1,28 @@
-const {aggregatorV3InterfaceABI, UniPairAbi, ERC20Abi, mockERC20Abi, stopLossVaultABI, settingsABI, quickSwapRouterABI} = require("../utils/abi.js")
+const {aggregatorV3InterfaceABI, UniPairAbi, ERC20Abi, quickSwapFactoryAbi, stopLossVaultABI, settingsABI, quickSwapRouterABI} = require("../utils/abi.js")
 const {addresses} = require("../utils/addresses.js")
 const {ethers} = require("ethers")
 const axios = require("axios")
 const StopLossVault = require("../build/contracts/StopLossVault.json")
 const Controller = require("../build/contracts/Controller.json")
 const Settings = require("../build/contracts/Settings.json")
+const TOKENLIST = require("../utils/TOKENLIST.json")
 const BigNumber = require("bignumber.js");
 require('dotenv').config()
 
 // const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL);
-const provider = new ethers.providers.JsonRpcProvider("https://rpc-mainnet.maticvigil.com/v1/4b331c188697971af1cd6f05bb7065bc358b7e89");
+const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL);
 
 //web3shit
 const fetchSigner = async () => {
-    const provider = new ethers.providers.JsonRpcProvider("https://rpc-mainnet.maticvigil.com/v1/4b331c188697971af1cd6f05bb7065bc358b7e89");
-    const wsProvider = new ethers.providers.WebSocketProvider("wss://rpc-mainnet.maticvigil.com/ws/v1/4b331c188697971af1cd6f05bb7065bc358b7e89");
+    const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL);
     
     const wallet = new ethers.Wallet(process.env.PRIVATE_KEY);
     
     const signer = wallet.connect(provider);
-    const wsSigner = wallet.connect(provider);
     console.log(`connected to ${signer.address}`);
     
     return signer;
-};//works
+};
 
 
 
@@ -382,11 +381,229 @@ const getUserTrades = async (nftIds, _vaultMode) => {
     return trades
 }
 
+const getTokenList = async () => {
+    const url = `https://unpkg.com/quickswap-default-token-list@1.0.91/build/quickswap-default.tokenlist.json`
+    const tokenList = await axios.get(url)
+    return tokenList.data
+}
+
+
+const fetchLPInfo = async (LPTokenAddress) => {
+    const lpctr = await fetchContract(LPTokenAddress, UniPairAbi)
+    
+
+    const _token0 =  lpctr.token0()
+    const _token1 =  lpctr.token1()
+    const _reserves =  lpctr.getReserves()
+    const _totalSupply = lpctr.totalSupply()
+
+    const batch1 = [_token0, _token1, _reserves, _totalSupply]
+    const [
+        token0,
+        token1,
+        reserves,
+        totalSupply
+    ] = await Promise.all(batch1)
+
+    const _token0ctr = await fetchContract(token0, ERC20Abi)
+    const _token1ctr = await fetchContract(token1, ERC20Abi)
+
+    const _token0Decimals =  _token0ctr.decimals()
+    const _token0Symbol =  _token0ctr.symbol()
+
+    const _token1Decimals =  _token1ctr.decimals()
+    const _token1Symbol =  _token1ctr.symbol()
+
+    const batch2 = [_token0Decimals, _token0Symbol, _token1Decimals, _token1Symbol]
+    const [
+        token0Decimals,
+        token0Symbol,
+        token1Decimals,
+        token1Symbol
+
+    ] = await Promise.all(batch2)
+
+
+
+    const token0Reserves = ethers.utils.formatUnits(reserves._reserve0, token0Decimals)
+    const token1Reserves = ethers.utils.formatUnits(reserves._reserve1, token1Decimals)
+    const bnToken0Reserves = new BigNumber(token0Reserves)
+    const bnToken1Reserves = new BigNumber(token1Reserves)
+
+    const token0Price = bnToken0Reserves.div(bnToken1Reserves).toPrecision()
+    const token1Price = bnToken1Reserves.div(bnToken0Reserves).toPrecision()
+    const formattedTotalSupply = ethers.utils.formatUnits(totalSupply, 18)
+    
+
+
+    const data = {
+        LPTotalSupply: formattedTotalSupply,
+        token0: {
+            address: token0,
+            symbol: token0Symbol,
+            reserves: token0Reserves,
+            decimals: token0Decimals,
+            priceRatio: token0Price,
+
+        },
+        token1: {
+            address: token1,
+            symbol: token1Symbol,
+            reserves: token1Reserves,
+            decimals: token1Decimals,
+            priceRatio: token1Price,
+
+
+        }
+    }
+
+    return data
+}
+
+
+const fetchTokenLiquidityInfo = async (_token) => {
+
+    const WHITELIST = [
+        addresses.tokens.MATIC, // MATIC
+        addresses.tokens.DAI, // DAI
+        addresses.tokens.USDT, // USDT
+        addresses.tokens.USDC, // USDC
+        addresses.tokens.MiMATIC, // MAI
+        addresses.tokens.BTC, // BTC
+        addresses.tokens.ETH, // WETH
+      ]
+
+      const factoryctr = await fetchContract(addresses.FACTORY, quickSwapFactoryAbi)
+
+      
+  
+      const quoteToken = addresses.tokens.MATIC
+      
+      if (_token.toLowerCase() == quoteToken.toLowerCase()) {
+          console.log("both token and quote token are the same")
+          return 1
+      }
+  
+      //work it
+      const quoteTokenMap = WHITELIST.map( async (quoteToken) => {
+          const pairAddress = await factoryctr.getPair(_token, quoteToken)
+  
+          if (pairAddress.toLowerCase() !== addresses.ZERO_ADDRESS.toLowerCase()) {
+              const pairctr = await fetchContract(pairAddress, UniPairAbi)
+              const token0 = await pairctr.token0()
+              const token1 = await pairctr.token1()
+  
+              let token0PairPromises = []
+              if (_token.toLowerCase() == token0.toLowerCase()) {
+                const pairInfo = fetchLPInfo(pairAddress)
+
+                token0PairPromises.push(pairInfo)
+              }
+              let token1PairPromises = []
+              if (_token.toLowerCase() == token1.toLowerCase()){
+                const pairInfo = fetchLPInfo(pairAddress)
+                  // token0/_token * MATIC/token0 //derived rpice
+                  token1PairPromises.push(pairInfo)
+              }
+
+              const token0Pairs = await Promise.all(token0PairPromises)
+              const token1Pairs = await Promise.all(token1PairPromises)
+              return {
+                  ...token0Pairs,
+                  ...token1Pairs
+              }
+          }
+      })
+  
+  
+      const raw = await Promise.all(quoteTokenMap)
+      const data = raw.filter( (item) => {
+          return item !== undefined
+      })
+  
+  
+      return data
+}
+
+const getBestSwapRate = async (_tokenA, _tokenB) => {
+    const WHITELIST = [
+        addresses.tokens.MATIC, // MATIC
+        addresses.tokens.DAI, // DAI
+        addresses.tokens.USDT, // USDT
+        addresses.tokens.USDC, // USDC
+        addresses.tokens.MiMATIC, // MAI
+        addresses.tokens.BTC, // BTC
+        addresses.tokens.ETH, // WETH
+      ]
+
+    const tokenA = TOKENLIST.tokens.filter( (token) => {
+        return token.address.toLowerCase() == _tokenA.toLowerCase()
+        }) //imported from ../utils/pools
+
+    const tokenB = TOKENLIST.tokens.filter( (token) => {
+        return token.address.toLowerCase() == _tokenB.toLowerCase()
+        }) //imported from ../utils/pools
+    
+      const ctr = await fetchContract(addresses.ROUTER, quickSwapRouterABI)
+      const oneA = ethers.utils.parseUnits("1", tokenA[0].decimals)
+      const oneB = ethers.utils.parseUnits("1", tokenB[0].decimals)
+    
+
+    
+    const ratePromises = WHITELIST.map( async (quoteToken) => {
+        try {
+        const rateAB =  await ctr.getAmountsOut(oneA, [tokenA[0].address, quoteToken, tokenB[0].address])
+        const rateBA = await ctr.getAmountsOut(oneB, [tokenB[0].address, quoteToken, tokenA[0].address])
+        return {
+            quoteToken,
+            rateAB,
+            rateBA
+        }
+        } catch (err) {console.log(`No LP for ${quoteToken}`)}
+    })
+    
+    const rawRates = await Promise.all(ratePromises)
+
+    const rates = rawRates.filter( (item) => {
+        return item !== undefined //remove nonexistent LPs
+    })
+
+    const ratesMap = rates.map( (rate) => {
+        const amountBPerOneA = ethers.utils.formatUnits(rate.rateAB[2], tokenB[0].decimals)
+        const amountAPerOneB = ethers.utils.formatUnits(rate.rateBA[2], tokenA[0].decimals)
+        return {
+            pathAB: [_tokenA, rate.quoteToken, _tokenB],
+            BPerA: amountBPerOneA,
+            pathBA: [_tokenB, rate.quoteToken, _tokenA],
+            APerB: amountAPerOneB
+        }
+        
+    })
+
+    const rankedPriceAB = ratesMap.sort( (a,b) => {
+        
+            return parseFloat(b.BPerA) - parseFloat(a.BPerA)     
+    })
+
+    const rankedPriceBA = ratesMap.sort( (a,b) => {
+        
+        return parseFloat(b.APerB) - parseFloat(a.APerB)     
+    })
+
+    return {
+        BPerA: rankedPriceAB[0].BPerA,
+        APerB: rankedPriceBA[0].APerB
+    }
+
+}
+
 
 const main = async () => {
-    
-    const trades = await getUserTrades([1, 2], 0)
-    console.log(trades)
+   
+
+    const data = await getBestSwapRate(addresses.tokens.MATIC, addresses.tokens.USDC)
+
+    console.log(data)
     // const signer = await fetchSigner()
     // const cobctr = await fetchContract(addresses.tokens.COB, ERC20Abi)
     // const usdcctr = await fetchContract(addresses.tokens.USDC, ERC20Abi)

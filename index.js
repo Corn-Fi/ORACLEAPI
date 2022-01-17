@@ -19,9 +19,6 @@ app.use(express.json())
 const priceOracleRoute = require("./routes/price.js")
 app.use('/price', priceOracleRoute)
 
-const stopLossRoute = require("./routes/stoploss.js")
-app.use("/stoploss", stopLossRoute)
-
 const limitRoute = require("./routes/limit.js")
 app.use("/limit", limitRoute)
 
@@ -34,12 +31,15 @@ app.use("/accumulatordistributor", accDistRoute)
 const chef = require("./routes/chef.js")
 app.use("/chef", chef)
 
+const equityRouter = require("./routes/equityRouter")
+app.use("/router", equityRouter)
+
 //run it
 const port = 8090 //for local
 
 const PORT = process.env.PORT || 3000 //for prod
 
 app.listen(
-    PORT,
-    () => console.log(`SERVER RUNNING ON PORT ${PORT}`)
+    port,
+    () => console.log(`SERVER RUNNING ON PORT ${port}`)
 )
