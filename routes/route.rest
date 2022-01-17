@@ -2,6 +2,46 @@ GET http://localhost:8090/price/matic
 ###
 
 GET http://localhost:8090/
+
 ###
 
-GET http://localhost:8090/stoploss/nfts/0x395977E98105A96328357f847Edc75333015b8f4
+GET http://localhost:8090/limit/openOrders
+
+###LIMIT VAULT ENDPOINTS
+
+GET http://localhost:8090/limit/vaults/0x395977E98105A96328357f847Edc75333015b8f4
+
+###
+
+GET http://localhost:8090/limit/trades/1
+
+
+### STOP VAULTS ENDPOINTS
+
+GET http://localhost:8090/stop/openOrders
+
+###
+GET http://localhost:8090/stop/vaults/0x395977E98105A96328357f847Edc75333015b8f4
+
+###
+
+GET http://localhost:8090/stop/trades/17
+
+### ACCUMULATOR/DISTRIBUTOR ENDPOINTS
+GET http://localhost:8090/accumulatordistributor/vaults/0x395977E98105A96328357f847Edc75333015b8f4
+###
+
+GET http://localhost:8090/accumulatordistributor/openOrders
+
+###
+
+GET http://localhost:8090/chef/poolData
+
+###
+
+GET http://localhost:8090/chef/userPoolData/0x395977E98105A96328357f847Edc75333015b8f4
+
+
+###
+
+GET http://localhost:8090/router/?tokenA=0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270&tokenB=0x2791bca1f2de4661ed88a30c99a7a9449aa84174
