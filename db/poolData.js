@@ -5,7 +5,6 @@ const {pools} = require("../utils/pools")
 const {ethers} = require("ethers")
 const axios = require("axios")
 
-const { readLatestPoolData } = require("./apy")
 
 const StopLossVault = require("../build/contracts/StopLossVault.json")
 const Controller = require("../build/contracts/Controller.json")
@@ -525,22 +524,11 @@ const fetchAllPoolApyData = async () => {
     return data
 }
 
-const poolDataRouter = router.get('/latest', async (req, res) => {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "X-Requested-With");
-    try {
-        const data = await readLatestPoolData()
-        res.json(data)
-    } catch (err) {
-        res.status(500)
-        res.json(err)
-    }
-})
+
 
 
 
 module.exports = {
-    poolDataRouter,
     fetchAllPoolApyData,
 }
 
