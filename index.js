@@ -10,8 +10,8 @@ const cron = require('node-cron');
 
 
 //database
-const databaseURI = `mongodb+srv://cornoracleapi:NdfVR0pnB8KNVLFi@test.mqzkk.mongodb.net/PoolData?retryWrites=true&w=majority`
-mongoose.connect(databaseURI)
+const URI = process.env.MONGODB_URI
+mongoose.connect(URI)
 const db = mongoose.connection
 
 db.once('open', () => {

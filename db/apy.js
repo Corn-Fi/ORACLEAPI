@@ -5,7 +5,7 @@ const axios = require("axios")
 const {fetchAllPoolApyData} = require("./poolData")
 require('dotenv').config()
 
-const URI = process.env.DATABASE_URI
+const URI = process.env.MONGODB_URI
 mongoose.connect(URI)
 
 const dataSchema  = new mongoose.Schema({
