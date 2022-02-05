@@ -3,9 +3,10 @@ const router = express.Router()
 const mongoose = require("mongoose")
 const axios = require("axios")
 const {fetchAllPoolApyData} = require("./poolData")
-const databaseURI = `mongodb+srv://cornoracleapi:NdfVR0pnB8KNVLFi@test.mqzkk.mongodb.net/PoolData?retryWrites=true&w=majority`
+require('dotenv').config()
 
-mongoose.connect(databaseURI)
+const URI = process.env.DATABASE_URI
+mongoose.connect(URI)
 
 const dataSchema  = new mongoose.Schema({
     
