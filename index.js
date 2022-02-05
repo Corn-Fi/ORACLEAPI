@@ -66,8 +66,8 @@ const PORT = process.env.PORT || 3000 //for prod
 
 
 app.listen(
-  port,
-    () => console.log(`SERVER RUNNING ON PORT ${port}`)
+  PORT,
+    () => console.log(`SERVER RUNNING ON PORT ${PORT}`)
 )
 
 const task = cron.schedule('*/5 * * * *', async () => {
