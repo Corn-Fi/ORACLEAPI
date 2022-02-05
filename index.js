@@ -1,7 +1,22 @@
 const express = require("express");
+const mongoose = require("mongoose")
 const app = express()
 const cors = require("cors")
 const ethers = require("ethers");
+
+
+const {writeAllPoolData} = require("./db/apy")
+const cron = require('node-cron');
+
+
+//database
+const databaseURI = `mongodb+srv://cornoracleapi:NdfVR0pnB8KNVLFi@test.mqzkk.mongodb.net/PoolData?retryWrites=true&w=majority`
+mongoose.connect(databaseURI)
+const db = mongoose.connection
+
+db.once('open', () => {
+  console.log("Connected to database")
+})
 
 //cors
 app.use(cors())
@@ -31,15 +46,32 @@ app.use("/accumulatordistributor", accDistRoute)
 const chef = require("./routes/chef.js")
 app.use("/chef", chef)
 
-const equityRouter = require("./routes/equityRouter")
-app.use("/router", equityRouter)
+const chef2 = require("./routes/chef2.js")
+app.use("/chef2", chef2)
+
+const equityRouterRoute = require("./routes/equityRouter")
+app.use("/router", equityRouterRoute)
+
+const {poolDataRouter} = require("./db/apy.js")
+app.use("/poolData", poolDataRouter)
+
+
+
+
 
 //run it
 const port = 8090 //for local
 
 const PORT = process.env.PORT || 3000 //for prod
 
+
 app.listen(
-    PORT,
+  PORT,
     () => console.log(`SERVER RUNNING ON PORT ${PORT}`)
 )
+
+const task = cron.schedule('*/5 * * * *', async () => {
+  writeAllPoolData()
+  console.log("ran task")
+});
+task.start()

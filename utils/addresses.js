@@ -25,13 +25,13 @@ const addresses = {
         cobUSDCCLP: "0x972575f78ee1738fc578289b1de98e0cd90c0119"
     },
     vaults: {
-        controller: "0xfeD1424aF43D162B421EabB162d8678c46bD3E03",
-        settings: "0x35d83d9D76bC186d5bA22C2017D6Aa17FE9DAe46",
-        limitVault: "0xC6b218f51dEC3ce84c961782246d0789327933A3",
-        stopVault: "0xA28566E92E524Acf840B71dDC15Ee8877896947d",
-        accDistVault: "0xba1E89fdAB23f1097566f69F986dC0BFC49BF6CE",
-        simpleStrategy: "0xA541AC8CC374781f9D29b6E1d5a5F9C9b8256d9F",
-        aaveStrategy: "0xe92364f6F04416bdfbD7cdEd4a2F78e1bbF1b3C8"
+        controller: "0x07f53502db0e721e47BE3F01d2B8aC3D86ED9B22",
+        resolver: "0x3dfcB8a33D0733A8b1222B178B163aa3F1F1091B",
+        limitVault: "0xD7c32710Ff3d2Ea038f56DA7Fd019A157263F412",
+        stopVault: "0xF48b4223b968d33A951169B22B7a9B25A8FaCe09",
+        accDistVault: "0x54819ec7F50250d8D2A05861265FD05f4c9C801E",
+        simpleStrategy: "0xF609fa22367268553F44cB4E9802c8Bb057D55F5",
+        aaveStrategy: "0x905eD8C3A3EF813490D2DAAdDf36E57a3AFC2D2F"
     },
     tokens: {
         BTC: "0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6",
